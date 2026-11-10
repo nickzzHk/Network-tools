@@ -28,9 +28,11 @@ As ferramentas presentes neste repositório foram desenvolvidas estritamente par
    git clone https://github.com/nickzzHk/Network-tools.git
 
 2. Instale as dependências:
+    '''bash
     pip install scapy colorama
 
 3. Antes de rodar não se esqueça de usar o sudo:
+    '''bash
     sudo python3 port_scanner.py -H 127.0.0.1 -p 1-1000
 
 
