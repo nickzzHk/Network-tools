@@ -28,21 +28,11 @@ As ferramentas presentes neste repositório foram desenvolvidas estritamente par
    git clone https://github.com/nickzzHk/Network-tools.git
 
 2. Instale as dependências:
-    '''bash
-    pip install scapy colorama
+    ```bash
+     pip install scapy colorama
 
 3. Antes de rodar não se esqueça de usar o sudo:
-    '''bash
+    ```bash
     sudo python3 port_scanner.py -H 127.0.0.1 -p 1-1000
 
 
-### Passo 3: Salvar
-1. Desce a página até o final.
-2. Na caixa "Commit changes", escreve: `Criando README.md com documentação do projeto`.
-3. Clica no botão verde **"Commit changes"**.
-
----
-
-Pronto! Agora, quando aqueles 13 caras (ou qualquer outra pessoa) entrarem no teu repositório, eles vão ver um projeto profissional, documentado, com aviso legal e instruções de uso.
-
-Faz isso rapidinho e **depois coloca o celular no carregador e vai descansar**. O GitHub tá salvo, o LinkedIn tá feito, o README tá no ar. O cowboy já venceu o dia! 🤝💻🚀
