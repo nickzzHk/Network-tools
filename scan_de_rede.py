@@ -10,22 +10,37 @@ def scanear_rede(ip, mascara):
     pkt = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(op=1, pdst=destino)
     try:
         enviar, _ = srp(pkt, timeout=5, verbose=False)
-        print(Fore.GREEN + Style.BRIGHT + "[--- IP ---]\t\t[--- MAC ---]")
+
+        if not enviar:
+            print("Nenhum dispositivo encontrado na rede, ou (IP/masca>
+            return
+
+        print(Fore.GREEN + Style.BRIGHT + "[--- IP ---]\t\t[--- MAC -->
         for enviado, recebido in enviar:
             ip_receb = recebido.psrc
             mac_receb = recebido.hwsrc
             print(ip_receb + "\t\t" + mac_receb)
+
+    except KeyboardInterrupt:
+        print(Fore.YELLOW + "Scan encerrado por ^C")
+
+    except PermissionError:
+        print(Fore.RED + "Precisa de permissão root para rodar arquivo>
+
+    except Exception as e:
+        print(Fore.RED + f"Ocorreu um erro inesperado: {e}")
+
     finally:
        fim = time.time() - inicio
-       print(Fore.YELLOW + Style.BRIGHT + f"Scan completo em {fim:.2f}")
+       print(Fore.YELLOW + Style.BRIGHT + f"Scan completo em {fim:.2f}>
 
 def menu():
 
     p = argparse.ArgumentParser(
            description="Scan de rede"
                                )
-    p.add_argument("-i", "--ip", help="Digite o IP (ex:192.168.1.0)")
-    p.add_argument("-m", "--masq", help="Digite sua mascara de subrede (ex: /24, /25, para saber qual é basta dar um [ip a] em inet você vera seu ip seguido pela mascara")
+    p.add_argument("-i", "--ip", required=True, help="Digite o IP (ex:>
+    p.add_argument("-m", "--masq", required=True, help="Digite sua mas>
 
     args = p.parse_args()
     print(f"Iniciando scan em: {args.ip}")
